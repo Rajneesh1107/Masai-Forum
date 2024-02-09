@@ -41,9 +41,18 @@ exports.createPost = async (req, res) => {
   }
 };
 
-exports.updatPost = async (req, res) => {
+exports.postDeleted = async (req, res) => {
   const { id } = req.params;
 
   try {
-  } catch (error) {}
+    if (id) {
+      let deletedPost = await postModel.findByIdAndDelete({ _id: id });
+      deletedPost.save();
+      res.status(http.OK).send({ msg: "post deleted" });
+    } else {
+      res.status(http.NOT_FOUND).send({ msg: "post not found" });
+    }
+  } catch (error) {
+    res.status(http.BAD_REQUEST).send({ msg: error });
+  }
 };

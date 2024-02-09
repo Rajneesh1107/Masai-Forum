@@ -1,8 +1,10 @@
 const { verifyToken } = require("../lib/helper/common");
 const { http } = require("../lib/helper/const");
 const { logoutModel } = require("../models/blacklist.model");
+const postModel = require("../models/post.model");
 
-const auth = async (req, res, next) => {
+const deletePost = async (req, res, next) => {
+  const {id} =req.params
   const token = req.headers.authorization.split(" ")[1].trim();
 
   try {
@@ -10,11 +12,13 @@ const auth = async (req, res, next) => {
     if (isLogout) {
       res.status(http.UNAUTHORIZED).send({ msg: "please login again" });
     }
+   
     let decode = verifyToken(token);
-
-    if (decode.id == req.params.id) {
+    
+    let postDetails= await postModel.find({_id:id});
+    if(postDetails.user_id==decode.id){
       next();
-    } else {
+    }else {
       res.status(http.UNAUTHORIZED).send({ msg: "you are not authorised" });
     }
   } catch (error) {
@@ -24,4 +28,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth };
+module.exports = { deletePost };
